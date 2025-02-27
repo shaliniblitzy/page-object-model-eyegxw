@@ -67,7 +67,7 @@ jobs:
         files: "**/target/surefire-reports/*.xml"
     
     - name: Upload HTML Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-reports
@@ -75,7 +75,7 @@ jobs:
         retention-days: 7
     
     - name: Upload Screenshots
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: test-screenshots
@@ -110,7 +110,7 @@ jobs:
         files: "**/target/surefire-reports/*.xml"
     
     - name: Upload HTML Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: cross-browser-reports-${{ matrix.browser }}
@@ -118,7 +118,7 @@ jobs:
         retention-days: 7
     
     - name: Upload Screenshots
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: cross-browser-screenshots-${{ matrix.browser }}

@@ -33,7 +33,7 @@ jobs:
       run: mvn -B package -DskipTests
       
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: selenium-framework
         path: target/*.jar
@@ -78,7 +78,7 @@ jobs:
         echo "Checkstyle and SpotBugs analysis completed" >> code-quality-reports/summary.txt
         
     - name: Upload code quality report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: code-quality-reports
         path: code-quality-reports/
