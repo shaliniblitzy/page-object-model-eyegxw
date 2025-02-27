@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+  selenium-hub:
+    image: selenium/hub:4.8.3
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=16
+      - GRID_TIMEOUT=300
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - selenium-grid-network
+
+  chrome:
+    image: selenium/node-chrome:4.8.3
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+    volumes:
+      - /dev/shm:/dev/shm
+    deploy:
+      replicas: 2
+    networks:
+      - selenium-grid-network
+
+  firefox:
+    image: selenium/node-firefox:4.8.3
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+    volumes:
+      - /dev/shm:/dev/shm
+    deploy:
+      replicas: 2
+    networks:
+      - selenium-grid-network
+
+  edge:
+    image: selenium/node-edge:4.8.3
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+    volumes:
+      - /dev/shm:/dev/shm
+    deploy:
+      replicas: 1
+    networks:
+      - selenium-grid-network
+
+networks:
+  selenium-grid-network:
+    driver: bridge
