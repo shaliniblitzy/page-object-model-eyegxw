@@ -54,7 +54,7 @@ jobs:
         distribution: 'temurin'
         
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: java
         
@@ -67,7 +67,7 @@ jobs:
       continue-on-error: true
       
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       
     - name: Generate code quality report
       run: |
