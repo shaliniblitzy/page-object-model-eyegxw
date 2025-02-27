@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <!-- Theme settings -->
+    <theme>standard</theme>
+    
+    <!-- Report encoding -->
+    <encoding>UTF-8</encoding>
+    
+    <!-- Document title and report name -->
+    <documentTitle>Storydoc Signup Test Automation Report</documentTitle>
+    <reportName>Selenium Automation Results</reportName>
+    
+    <!-- Date/time format -->
+    <timeStampFormat>MMM dd, yyyy HH:mm:ss</timeStampFormat>
+    
+    <!-- Custom JS (empty means use default) -->
+    <js></js>
+    
+    <!-- Custom CSS (empty means use default) -->
+    <css></css>
+    
+    <!-- Enable screenshots in report -->
+    <enableScreenshots>true</enableScreenshots>
+    
+    <!-- Run in offline mode (all resources embedded) -->
+    <offlineMode>true</offlineMode>
+    
+    <!-- Show system information section -->
+    <enableSystemInfo>true</enableSystemInfo>
+</extentreports>
