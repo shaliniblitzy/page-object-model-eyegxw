@@ -1,0 +1,68 @@
+# Dependabot configuration file for automating dependency updates
+# across multiple package ecosystems in the Selenium automation framework
+
+version: 2
+updates:
+  # Maven dependencies for Java-based Selenium framework
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "java"
+    assignees:
+      - "qa-lead"
+    reviewers:
+      - "automation-team"
+    commit-message:
+      prefix: "maven"
+      include: "scope"
+    ignore:
+      # Ignore patch updates for non-critical dependencies
+      - dependency-name: "org.apache.commons:commons-lang3"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "org.slf4j:slf4j-api"
+        update-types: ["version-update:semver-patch"]
+
+  # GitHub Actions for CI/CD workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "github-actions"
+      include: "scope"
+
+  # Docker dependencies for containerized test environments
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+
+  # Terraform dependencies for infrastructure management
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "terraform"
+      - "infrastructure"
+    commit-message:
+      prefix: "terraform"
+      include: "scope"
