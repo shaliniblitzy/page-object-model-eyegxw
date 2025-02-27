@@ -1,0 +1,57 @@
+# When pull requests modify specific files or directories, GitHub automatically
+# requests reviews from the designated owners.
+
+# Default ownership - QA Lead will be requested to review all changes
+# unless a more specific rule below applies
+* @qa-lead
+
+# Core framework components
+/src/test/com/storydoc/core/ @test-architect @qa-lead
+
+# Configuration classes
+/src/test/com/storydoc/config/ @test-architect
+
+# Exception classes
+/src/test/com/storydoc/exceptions/ @test-architect
+
+# Page objects
+/src/test/com/storydoc/pages/ @qa-automation-team
+
+# Element locators
+/src/test/com/storydoc/locators/ @qa-automation-team
+
+# Test cases
+/src/test/com/storydoc/tests/ @qa-automation-team @qa-lead
+
+# Utility classes
+/src/test/com/storydoc/utils/ @qa-automation-team
+
+# Data models
+/src/test/com/storydoc/models/ @qa-automation-team
+
+# Constants
+/src/test/com/storydoc/constants/ @qa-automation-team
+
+# Reporting components
+/src/test/com/storydoc/reports/ @qa-automation-team
+
+# Configuration files
+/src/test/config/ @qa-lead @test-architect
+
+# Test data files
+/src/test/data/ @qa-automation-team
+
+# Infrastructure configuration
+/infrastructure/ @devops-team @test-architect
+
+# GitHub workflow files
+/.github/workflows/ @devops-team @qa-lead
+
+# TestNG configuration files
+/src/test/testng*.xml @qa-automation-team @qa-lead
+
+# Documentation
+/docs/ @qa-lead @qa-automation-team
+
+# Markdown files
+*.md @qa-lead
