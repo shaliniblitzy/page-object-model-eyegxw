@@ -1,0 +1,103 @@
+{
+  "validAccounts": [
+    {
+      "email": "valid_account1@example.com",
+      "password": "Test@1234",
+      "acceptedTerms": true,
+      "description": "Standard valid account for positive test flow"
+    },
+    {
+      "email": "valid_account2@example.com",
+      "password": "Password123!",
+      "acceptedTerms": true,
+      "description": "Alternative valid account for data-driven testing"
+    }
+  ],
+  "edgeCaseAccounts": [
+    {
+      "email": "long.email.address.test.user@example.com",
+      "password": "LongP@ssw0rd1234567890",
+      "acceptedTerms": true,
+      "description": "Account with maximum length inputs"
+    },
+    {
+      "email": "user@example.co.uk",
+      "password": "P@ss1",
+      "acceptedTerms": true,
+      "description": "Account with minimum length password and non-standard TLD"
+    }
+  ],
+  "invalidAccounts": [
+    {
+      "email": "invalid-email",
+      "password": "Test@1234",
+      "acceptedTerms": true,
+      "description": "Account with invalid email format for negative testing",
+      "expectedError": "Please enter a valid email address"
+    },
+    {
+      "email": "valid@example.com",
+      "password": "short",
+      "acceptedTerms": true,
+      "description": "Account with too short password for negative testing",
+      "expectedError": "Password must be at least 8 characters long"
+    },
+    {
+      "email": "valid@example.com",
+      "password": "passwordwithoutspecialchars",
+      "acceptedTerms": true,
+      "description": "Account with password missing special characters for negative testing",
+      "expectedError": "Password must include at least one special character"
+    },
+    {
+      "email": "valid@example.com",
+      "password": "Test@1234",
+      "acceptedTerms": false,
+      "description": "Account with terms not accepted for negative testing",
+      "expectedError": "You must accept the terms and conditions"
+    }
+  ],
+  "successMessages": [
+    "Your account has been created successfully",
+    "Welcome to Storydoc",
+    "Account created successfully"
+  ],
+  "signupPageConfig": {
+    "url": "https://editor-staging.storydoc.com/sign-up",
+    "title": "Storydoc Signup",
+    "expectedElements": [
+      "email-field",
+      "password-field",
+      "terms-checkbox",
+      "signup-button"
+    ],
+    "timeouts": {
+      "pageLoad": 10,
+      "formSubmission": 15,
+      "successMessage": 5
+    }
+  },
+  "emailDomains": [
+    "example.com",
+    "storydoc-test.com",
+    "testemail.org"
+  ],
+  "passwordRequirements": {
+    "minLength": 8,
+    "requiresUppercase": true,
+    "requiresLowercase": true,
+    "requiresNumber": true,
+    "requiresSpecialChar": true,
+    "validSpecialChars": "!@#$%^&*()_-+=<>?"
+  },
+  "testEnvironments": {
+    "staging": {
+      "baseUrl": "https://editor-staging.storydoc.com",
+      "apiUrl": "https://api-staging.storydoc.com"
+    },
+    "dev": {
+      "baseUrl": "https://editor-dev.storydoc.com",
+      "apiUrl": "https://api-dev.storydoc.com"
+    }
+  }
+}
