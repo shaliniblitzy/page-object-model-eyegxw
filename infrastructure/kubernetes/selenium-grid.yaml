@@ -1,0 +1,343 @@
+---
+# Namespace for Selenium Grid resources
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: selenium-grid
+  labels:
+    name: selenium-grid
+    app: selenium-testing
+
+---
+# Selenium Hub Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selenium-hub
+  namespace: selenium-grid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selenium-hub
+  template:
+    metadata:
+      labels:
+        app: selenium-hub
+    spec:
+      containers:
+      - name: selenium-hub
+        image: selenium/hub:4.8.0
+        ports:
+        - containerPort: 4444
+          name: webdriver
+        - containerPort: 4442
+          name: grid-pub
+        - containerPort: 4443
+          name: grid-sub
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        env:
+        - name: SE_GRID_MAX_SESSION
+          value: "25"
+        - name: SE_GRID_BROWSER_TIMEOUT
+          value: "300"
+        - name: SE_GRID_TIMEOUT
+          value: "300"
+        readinessProbe:
+          httpGet:
+            path: /wd/hub/status
+            port: 4444
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /wd/hub/status
+            port: 4444
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 15
+
+---
+# Selenium Hub Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: selenium-hub
+  namespace: selenium-grid
+  labels:
+    app: selenium-hub
+spec:
+  ports:
+  - port: 4444
+    targetPort: 4444
+    name: webdriver
+  - port: 4442
+    targetPort: 4442
+    name: grid-pub
+  - port: 4443
+    targetPort: 4443
+    name: grid-sub
+  selector:
+    app: selenium-hub
+  type: ClusterIP
+
+---
+# Chrome Node Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chrome-node
+  namespace: selenium-grid
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chrome-node
+  template:
+    metadata:
+      labels:
+        app: chrome-node
+    spec:
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      containers:
+      - name: chrome-node
+        image: selenium/node-chrome:4.8.0
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
+        resources:
+          limits:
+            cpu: "1.5"
+            memory: "3Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+        env:
+        - name: SE_EVENT_BUS_HOST
+          value: "selenium-hub"
+        - name: SE_EVENT_BUS_PUBLISH_PORT
+          value: "4442"
+        - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+          value: "4443"
+        - name: SE_NODE_MAX_SESSIONS
+          value: "5"
+        - name: SE_NODE_SESSION_TIMEOUT
+          value: "300"
+        - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+          value: "true"
+        - name: SE_OPTS
+          value: "--log-level FINE"
+
+---
+# Firefox Node Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: firefox-node
+  namespace: selenium-grid
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: firefox-node
+  template:
+    metadata:
+      labels:
+        app: firefox-node
+    spec:
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      containers:
+      - name: firefox-node
+        image: selenium/node-firefox:4.8.0
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
+        resources:
+          limits:
+            cpu: "1.5"
+            memory: "3Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+        env:
+        - name: SE_EVENT_BUS_HOST
+          value: "selenium-hub"
+        - name: SE_EVENT_BUS_PUBLISH_PORT
+          value: "4442"
+        - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+          value: "4443"
+        - name: SE_NODE_MAX_SESSIONS
+          value: "5"
+        - name: SE_NODE_SESSION_TIMEOUT
+          value: "300"
+        - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+          value: "true"
+        - name: SE_OPTS
+          value: "--log-level FINE"
+
+---
+# Edge Node Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-node
+  namespace: selenium-grid
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: edge-node
+  template:
+    metadata:
+      labels:
+        app: edge-node
+    spec:
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      containers:
+      - name: edge-node
+        image: selenium/node-edge:4.8.0
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
+        resources:
+          limits:
+            cpu: "1.5"
+            memory: "3Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+        env:
+        - name: SE_EVENT_BUS_HOST
+          value: "selenium-hub"
+        - name: SE_EVENT_BUS_PUBLISH_PORT
+          value: "4442"
+        - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+          value: "4443"
+        - name: SE_NODE_MAX_SESSIONS
+          value: "5"
+        - name: SE_NODE_SESSION_TIMEOUT
+          value: "300"
+        - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+          value: "true"
+        - name: SE_OPTS
+          value: "--log-level FINE"
+
+---
+# Chrome Node HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: chrome-node-autoscaler
+  namespace: selenium-grid
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: chrome-node
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+
+---
+# Firefox Node HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: firefox-node-autoscaler
+  namespace: selenium-grid
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: firefox-node
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+
+---
+# Edge Node HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: edge-node-autoscaler
+  namespace: selenium-grid
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: edge-node
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
