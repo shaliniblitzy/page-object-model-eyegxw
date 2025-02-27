@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Storydoc Signup Test Suite" verbose="2" parallel="methods" thread-count="2" data-provider-thread-count="2">
+
+    <!-- Test execution listeners for reporting and lifecycle management -->
+    <listeners>
+        <listener class-name="com.storydoc.core.TestListener"/>
+        <listener class-name="com.storydoc.core.SuiteListener"/>
+    </listeners>
+
+    <!-- Primary signup flow test group -->
+    <test name="Signup Flow Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="environment" value="staging"/>
+        <classes>
+            <class name="com.storydoc.tests.SignupTests"/>
+        </classes>
+        <groups>
+            <run>
+                <include name="signup"/>
+                <include name="smoke"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+
+    <!-- UI element validation test group -->
+    <test name="Element Validation Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="environment" value="staging"/>
+        <classes>
+            <class name="com.storydoc.tests.ElementValidationTests"/>
+        </classes>
+        <groups>
+            <run>
+                <include name="element-validation"/>
+                <include name="smoke"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+
+    <!-- Form validation test group -->
+    <test name="Form Validation Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="environment" value="staging"/>
+        <classes>
+            <class name="com.storydoc.tests.FormValidationTests"/>
+        </classes>
+        <groups>
+            <run>
+                <include name="validation"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+
+    <!-- Confirmation page test group -->
+    <test name="Confirmation Page Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="environment" value="staging"/>
+        <classes>
+            <class name="com.storydoc.tests.ConfirmationPageTests"/>
+        </classes>
+        <groups>
+            <run>
+                <include name="confirmation"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+
+    <!-- Error handling test group -->
+    <test name="Error Handling Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="environment" value="staging"/>
+        <classes>
+            <class name="com.storydoc.tests.ErrorHandlingTests"/>
+        </classes>
+        <groups>
+            <run>
+                <include name="errors"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+
+</suite>
