@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  # Test framework service for running Selenium tests
+  test-framework:
+    build:
+      context: .
+    volumes:
+      - ./:/app                     # Mount source code
+      - ./target:/app/target        # Mount target directory for test reports
+    depends_on:
+      - selenium-hub
+    environment:
+      - SELENIUM_HUB_URL=http://selenium-hub:4444/wd/hub  # URL for remote WebDriver
+      - BROWSER=chrome              # Default browser for testing
+      - ENV=staging                 # Test environment
+      - HEADLESS=true               # Run in headless mode
+      - TEST_GROUPS=selenium        # TestNG groups to run
+    networks:
+      - selenium-network
+    command: mvn clean test -Dgroups="${TEST_GROUPS}" -Dselenium.hub.url="${SELENIUM_HUB_URL}" -Dbrowser="${BROWSER}" -Denv="${ENV}"
+
+  # Selenium Grid hub service
+  selenium-hub:
+    image: selenium/hub:4.8.0
+    ports:
+      - "4444:4444"  # WebDriver protocol
+      - "4442:4442"  # Grid distribution bus
+      - "4443:4443"  # Grid node registration
+    networks:
+      - selenium-network
+
+  # Chrome browser node
+  selenium-chrome:
+    image: selenium/node-chrome:4.8.0
+    volumes:
+      - /dev/shm:/dev/shm  # Shared memory for browser stability
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5       # Maximum concurrent sessions
+      - SE_NODE_MAX_INSTANCES=5      # Maximum browser instances
+      - SE_NODE_SESSION_TIMEOUT=300  # Session timeout in seconds
+    networks:
+      - selenium-network
+
+  # Firefox browser node
+  selenium-firefox:
+    image: selenium/node-firefox:4.8.0
+    volumes:
+      - /dev/shm:/dev/shm  # Shared memory for browser stability
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5       # Maximum concurrent sessions
+      - SE_NODE_MAX_INSTANCES=5      # Maximum browser instances
+      - SE_NODE_SESSION_TIMEOUT=300  # Session timeout in seconds
+    networks:
+      - selenium-network
+
+  # Edge browser node
+  selenium-edge:
+    image: selenium/node-edge:4.8.0
+    volumes:
+      - /dev/shm:/dev/shm  # Shared memory for browser stability
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5       # Maximum concurrent sessions
+      - SE_NODE_MAX_INSTANCES=5      # Maximum browser instances
+      - SE_NODE_SESSION_TIMEOUT=300  # Session timeout in seconds
+    networks:
+      - selenium-network
+
+# Network configuration
+networks:
+  selenium-network:
+    driver: bridge  # Standard bridge network for container communication
