@@ -1,0 +1,126 @@
+name: Storydoc Selenium Tests
+
+# Define events that trigger the workflow
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to run tests on'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+      environment:
+        description: 'Test environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - dev
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'testng.xml'
+        type: choice
+        options:
+          - testng.xml
+          - testng-crossbrowser.xml
+      headless:
+        description: 'Run in headless mode'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  test:
+    name: Selenium Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Run Selenium Tests
+      run: cd src/test && mvn test -Dgroups="selenium" -Denv=staging -Dbrowser=chrome -Dheadless=true -DsuiteXmlFile=testng.xml
+    
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: "**/target/surefire-reports/*.xml"
+    
+    - name: Upload HTML Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: src/test/test-output/extent-reports/
+        retention-days: 7
+    
+    - name: Upload Screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-screenshots
+        path: src/test/test-output/screenshots/
+        retention-days: 7
+
+  cross-browser-test:
+    name: Cross Browser Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Run Cross-Browser Tests
+      run: cd src/test && mvn test -Dgroups="selenium" -Denv=staging -Dbrowser=${{ matrix.browser }} -Dheadless=true -DsuiteXmlFile=testng-crossbrowser.xml
+    
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: "**/target/surefire-reports/*.xml"
+    
+    - name: Upload HTML Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cross-browser-reports-${{ matrix.browser }}
+        path: src/test/test-output/extent-reports/
+        retention-days: 7
+    
+    - name: Upload Screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cross-browser-screenshots-${{ matrix.browser }}
+        path: src/test/test-output/screenshots/
+        retention-days: 7
