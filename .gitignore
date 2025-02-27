@@ -1,0 +1,55 @@
+*.class
+target/
+bin/
+build/
+
+# Test reports and results
+test-output/
+src/test/results/
+extent-reports/
+*.html
+
+# Log files
+src/test/logs/
+*.log
+
+# Screenshots captured during test execution
+src/test/screenshots/
+
+# Browser drivers (binaries)
+src/test/drivers/*.exe
+src/test/drivers/*.dll
+src/test/drivers/chromedriver*
+src/test/drivers/geckodriver*
+src/test/drivers/msedgedriver*
+
+# IDE specific files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local configuration (may contain sensitive information)
+src/test/config/local.properties
+src/test/config/*-local.properties
+
+# Maven specific
+.mvn/
+mvnw
+mvnw.cmd
+.maven-classpath
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
